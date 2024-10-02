@@ -219,9 +219,20 @@ const App = () => {
             const statusImage = statusProfilePics[ticket.status] || pic; // Default image if status not found
   
             // Determine which image to show based on the current grouping
-            const displayImage = groupBy === 'user' ? userProfileImages[ticket.userId] || pic :
-              (groupBy === 'status' ? statusImage : priorityImage); // Fallback to priorityImage
-  
+            // Assuming these are the image paths for different priorities
+            const priorityImages1 = {
+              4: urgentPriority,   // Image for Urgent
+              3: highPriority,     // Image for High
+              2: mediumPriority,   // Image for Medium
+              1: lowPriority,      // Image for Low
+              0: nop,              // Image for No Priority
+            };
+
+// Function to determine the displayed image based on groupBy
+const displayImage = groupBy === 'user' ? 
+  priorityImages1[ticket.priority] || pic : // Fetch image based on ticket priority
+  (groupBy === 'status' ? priorityImages1[ticket.priority]  : priorityImage); // Fallback to priorityImage
+
             return (
               <div className="kanban-card" key={ticket.id} style={styles.kanbanCard}>
                 <div className="ticket-header">
@@ -338,6 +349,8 @@ const styles = {
     marginRight: '10px', // Space between image and title
     alignItems: 'center',
     marginTop:'-20px',
+    borderRadius: '50%', // Makes the image circular
+    
   },
   headerTitle: {
     fontSize: '16px', // Adjust as needed
