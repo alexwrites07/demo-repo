@@ -111,8 +111,8 @@ const App = () => {
       'Todo': todo,
       'Backlog': back,
       'In progress': inpic,
-      'Done': donePic, // Define a separate image for Done
-      'Cancelled': cancelledPic, // Define a separate image for Cancelled
+      'Done': donePic,
+      'Cancelled': cancelledPic,
     };
   
     // Mapping of user ids to profile images
@@ -124,11 +124,27 @@ const App = () => {
       'usr-5': profile5,
     };
   
-    return groupKeys.map(group => {
-      // Determine the priority image for the current group
-      let priorityImage;
+    // Define the priority order
+    const priorityOrder = ['Urgent', 'High', 'Medium', 'Low', 'No Priority'];
   
-      // Sort and map tickets for the current group
+    // Sort groupKeys based on groupBy
+    let sortedGroupKeys;
+    if (groupBy === 'priority') {
+      sortedGroupKeys = groupKeys.sort((a, b) => 
+        priorityOrder.indexOf(a) - priorityOrder.indexOf(b)
+      );
+    } else if (groupBy === 'user') {
+      sortedGroupKeys = groupKeys.sort((a, b) => {
+        const userA = users.find(u => u.id === a);
+        const userB = users.find(u => u.id === b);
+        return (userA?.name || '').localeCompare(userB?.name || '');
+      });
+    } else {
+      sortedGroupKeys = groupKeys; // No specific sorting for other groups
+    }
+  
+    return sortedGroupKeys.map(group => {
+      let priorityImage;
       const sortedTickets = sortTickets(groupedTickets[group]);
   
       // Fetch the appropriate image based on grouping
@@ -161,7 +177,7 @@ const App = () => {
           {/* Check if group is 'Done' or 'Cancelled' */}
           {group === 'Done' || group === 'Cancelled' ? (
             <div style={styles.columnHeader}>
-              <div style={styles.containerLeft}> {/* Aligns content to the left */}
+              <div style={styles.containerLeft}>
                 <img 
                   src={group === 'Done' ? donePic : cancelledPic} 
                   alt={`${group} Status`} 
@@ -172,14 +188,14 @@ const App = () => {
                 </h3>
               </div>
   
-              <div style={styles.columnActions}> {/* Aligns buttons to the right */}
+              <div style={styles.columnActions}>
                 <button style={styles.actionButton}><img src={plus} alt="Add" /></button>
                 <button style={styles.actionButton}><img src={dot} alt="Options" /></button>
               </div>
             </div>
           ) : (
             <div style={styles.columnHeader}>
-              <div style={styles.containerLeft}> {/* Aligns content to the left */}
+              <div style={styles.containerLeft}>
                 <img 
                   src={priorityImage} 
                   alt={groupBy === 'user' ? `${group} User` : `${group} Status`} 
@@ -190,7 +206,7 @@ const App = () => {
                 </h3>
               </div>
   
-              <div style={styles.columnActions}> {/* Aligns buttons to the right */}
+              <div style={styles.columnActions}>
                 <button style={styles.actionButton}><img src={plus} alt="Add" /></button>
                 <button style={styles.actionButton}><img src={dot} alt="Options" /></button>
               </div>
@@ -244,7 +260,6 @@ const App = () => {
       );
     });
   };
-  
   
 
  
